@@ -1,0 +1,7 @@
+data
+config/keys
+config/log
+config/nginx
+config/php
+config/www
+config/.migrations
