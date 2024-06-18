@@ -1,0 +1,42 @@
+name: CI for PHP Web Application with Database
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Cleanup previous runs
+        run: |
+          docker rm -f nginxserver || true
+          docker rm -f db || true
+          docker network prune -f
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Start Docker Compose
+        run: docker-compose up -d
+
+      - name: Wait for services to be ready
+        run: sleep 20
+
+      - name: Check web page
+        run: |
+          docker exec nginxserver curl -s localhost:80
+        continue-on-error: true
+
+      - name: Stop Docker Compose
+        run: docker-compose down
+
+      - name: Archive Docker logs (optional)
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-logs
+          path: /path/to/your/logs/*.log

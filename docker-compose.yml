@@ -1,7 +1,7 @@
 services:
-  nginx:
+  nginxserver:
     image: lscr.io/linuxserver/nginx:latest
-    container_name: nginx
+    container_name: "nginxserver"
     environment:
       - PUID=1000
       - PGID=1000
@@ -10,11 +10,11 @@ services:
       - ./www:/config/www
       - ./config:/config
     ports:
-      - 8080:80
+      - 8090:80
       - 443:443
     restart: unless-stopped
-    networks:
-      - app-network
+    depends_on:
+      - db
   
   db:
     image: mariadb
@@ -29,9 +29,3 @@ services:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     ports:
       - 3306:3306
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
